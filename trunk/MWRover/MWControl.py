@@ -57,7 +57,7 @@ class MaestroServo():
   def sendFrame(self, frame):
     framestr = ''
     for char in frame:
-      print "%0x" % char
+      #print "%0x" % char
       framestr += chr(char)
     self.ser.write(framestr)
           
@@ -107,7 +107,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
           #Normal form value
           field, item.value
-          print item, " ", item.value
+          print "Got command", field, ":", item.value
           self.server.MServo.setTarget(int(field), float(item.value))
     else:
       self.send_error(405)
@@ -120,7 +120,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
   HTTPServer = MWHTTPServer((HTTP_HOST,HTTP_PORT),HTTPHandler,MaestroServo)
-  print "Started"
+  print "Started MWRover Control"
   HTTPServer_thread = threading.Thread(target = HTTPServer.serve_forever())
   HTTPServer_thread.setDaemon(true)
   HTTPServer_thread.start()

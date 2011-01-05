@@ -60,6 +60,10 @@ function mouseDown(evt){
   document.onmousemove = document.ontouchmove = mouseMove;
   originBall.style.left = (cursorPos[0]-originBallSize/2) + "px";
   originBall.style.top = (cursorPos[1]-originBallSize/2) + "px";
+  targetBall.style.left = originBall.style.left;
+  targetBall.style.top = originBall.style.top;
+  originBall.style.visibility = "visible";
+  targetBall.style.visibility = "visible";
   return false;
 }
 
@@ -70,6 +74,8 @@ function mouseUp(evt){
   document.getElementById("debug").innerHTML = "STOPPED";
   sendCommand(servoPositionCentre);
   document.onmousemove = document.ontouchmove = null;
+  originBall.style.visibility = "hidden";
+  targetBall.style.visibility = "hidden";  
   return false;
 }
 
@@ -88,15 +94,15 @@ function mouseMove(evt){
   //Calculate difference to start position
   var cursorPos = getCoords(evt);
   
-  servoX = servoRange * (cursorPos[0] - mouseOriginX)/docMinSize;
-  servoY = servoRange * (cursorPos[1] - mouseOriginY)/docMinSize;
+  servoX = servoRange * (cursorPos[0] - mouseOriginX)*2/docMinSize;
+  servoY = servoRange * (cursorPos[1] - mouseOriginY)*2/docMinSize;
   
   date = new Date();
   currentTime = date.getTime();
   //Limit command rate to 4Hz to avoid spamming the controller
   if(currentTime-lastCommandTime > 250){
     for(x in servoPositions){
-      servoPositions[x] = -F[x] * servoY + -R[x] * servoX + servoCentre;
+      servoPositions[x] = Math.round((-F[x] * servoY + -R[x] * servoX + servoCentre)*100)/100;
       servoPositions[x] = ((servoPositions[x] < servoRangeMin) ? servoRangeMin : ((servoPositions[x] > servoRangeMax) ? servoRangeMax : servoPositions[x]));
     }
     lastCommandTime = currentTime;
@@ -110,6 +116,25 @@ function mouseMove(evt){
   return false;
 }
 
+function rotateLeft(){
+  for(x in servoPositions){
+    servoPositions[x] = Math.round((-CW[x] * 0.5 * servoRange + servoCentre)*100)/100;
+    servoPositions[x] = ((servoPositions[x] < servoRangeMin) ? servoRangeMin : ((servoPositions[x] > servoRangeMax) ? servoRangeMax : servoPositions[x]));
+  }    
+  eventsFired += 1;
+  document.getElementById("debug").innerHTML = servoPositions + "\n" + eventsFired;
+  sendCommand(servoPositions);  
+}
+
+function rotateRight(){
+  for(x in servoPositions){
+    servoPositions[x] = Math.round((CW[x] * 0.5 * servoRange + servoCentre)*100)/100;
+    servoPositions[x] = ((servoPositions[x] < servoRangeMin) ? servoRangeMin : ((servoPositions[x] > servoRangeMax) ? servoRangeMax : servoPositions[x]));
+  }    
+  eventsFired += 1;
+  document.getElementById("debug").innerHTML = servoPositions + "\n" + eventsFired;
+  sendCommand(servoPositions);    
+}
 
 var commandSend = getXMLHttpObject(); 
 if(commandSend==null){
@@ -151,10 +176,14 @@ function getXMLHttpObject(){
 
 function init(){
   //Using Legacy Events for widest support of browsers and platforms
-  document.onmousedown = document.ontouchstart = mouseDown;
+  document.getElementById("main").onmousedown = document.getElementById("main").ontouchstart = mouseDown;
   document.onmouseup = document.ontouchend = mouseUp;
   targetBall = document.getElementById("targetball");
   originBall = document.getElementById("originball");
+  document.getElementById("rotateleft").onmousedown = rotateLeft;
+  document.getElementById("rotateleft").onmouseup = mouseUp;
+  document.getElementById("rotateright").onmousedown = rotateRight;
+  document.getElementById("rotateright").onmouseup = mouseUp;
   docMinSize = (document.documentElement.clientWidth < document.documentElement.clientHeight?document.documentElement.clientWidth:document.documentElement.clientHeight);
   targetBallSize = 2 * Math.round(docMinSize / 20);
   originBallSize = 2 * Math.round(docMinSize / 20);
