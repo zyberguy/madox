@@ -7,6 +7,8 @@ http://www.madox.net/
 */
 
 body  {
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: 12pt;
   margin: 0px;
   /*overflow: hidden;*/
   border: none;
@@ -15,6 +17,7 @@ body  {
   background-color: black;
   color: white;
 }
+
 
 #originball, #targetball {
 	width: 20px;
@@ -25,6 +28,8 @@ body  {
 	position:absolute;
 	top: 0px;
 	left: 0px;
+  visibility: hidden;
+  z-index:9999;
 }
 
 #originball {
@@ -33,4 +38,49 @@ body  {
 
 #targetball {
   background-color: green;
+}
+
+#rotateleft, #rotateright, #camleft, #camright {
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: 12pt;
+  border:2px solid white;
+  background-color:#000080;
+  color:white;
+  position:absolute;
+}
+
+#rotateleft {
+  height:10%;
+  width:50%;
+  top:0%;
+  left:0%;
+}
+
+#rotateright {
+  height:10%;
+  width:50%;
+  top:0%;
+  left:50%;
+}
+
+#main {
+  height:80%;
+  width:100%;
+  top:10%;
+  left:0%;
+  position:absolute;
+}
+
+#camleft {
+  height:10%;
+  width:50%;
+  top:90%;
+  left:0%;
+}
+
+#camright {
+  height:10%;
+  width:50%;
+  top:90%;
+  left:50%;
 }

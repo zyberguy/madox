@@ -1,0 +1,5 @@
+export PATH=/mnt/storage/bin:/mnt/storage/MWRover:$PATH
+MW_setup_ap.sh
+start_sshd.sh
+cd /mnt/storage/MWRover
+python MWControl.py
