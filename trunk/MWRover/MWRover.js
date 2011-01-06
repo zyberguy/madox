@@ -51,10 +51,12 @@ var targetBall = null;
 var targetBallSize = 20;
 var originBall = null;
 var originBallSize = 20;
+var targetBar = null;
 
 function mouseDown(evt){
   //Start
   var cursorPos = getCoords(evt);
+  targetBar = evt.target.id;
   mouseOriginX = cursorPos[0];
   mouseOriginY = cursorPos[1];
   document.onmousemove = document.ontouchmove = mouseMove;
@@ -68,10 +70,8 @@ function mouseDown(evt){
 }
 
 function mouseUp(evt){
-  //Stop
-  mouseCapture = false;
   //Don't care, just stop the servos now
-  document.getElementById("debug").innerHTML = "STOPPED";
+  document.getElementById("debug").innerHTML = "STOPPED" + "<br>" + eventsFired + "<br>" + targetBar;
   sendCommand(servoPositionCentre);
   document.onmousemove = document.ontouchmove = null;
   originBall.style.visibility = "hidden";
@@ -93,7 +93,6 @@ function getCoords(evt){
 function mouseMove(evt){
   //Calculate difference to start position
   var cursorPos = getCoords(evt);
-  
   servoX = servoRange * (cursorPos[0] - mouseOriginX)*2/docMinSize;
   servoY = servoRange * (cursorPos[1] - mouseOriginY)*2/docMinSize;
   
@@ -101,39 +100,31 @@ function mouseMove(evt){
   currentTime = date.getTime();
   //Limit command rate to 4Hz to avoid spamming the controller
   if(currentTime-lastCommandTime > 250){
-    for(x in servoPositions){
-      servoPositions[x] = Math.round((-F[x] * servoY + -R[x] * servoX + servoCentre)*100)/100;
-      servoPositions[x] = ((servoPositions[x] < servoRangeMin) ? servoRangeMin : ((servoPositions[x] > servoRangeMax) ? servoRangeMax : servoPositions[x]));
+    if(targetBar == "mainbar"){
+      for(x in servoPositions){
+        servoPositions[x] = Math.round((-F[x] * servoY + -R[x] * servoX + servoCentre)*100)/100;
+        servoPositions[x] = ((servoPositions[x] < servoRangeMin) ? servoRangeMin : ((servoPositions[x] > servoRangeMax) ? servoRangeMax : servoPositions[x]));
+      }
+    } else if (targetBar == "rotatebar") {
+      for(x in servoPositions){
+        servoPositions[x] = Math.round((CW[x] * servoX + servoCentre)*100)/100;
+        servoPositions[x] = ((servoPositions[x] < servoRangeMin) ? servoRangeMin : ((servoPositions[x] > servoRangeMax) ? servoRangeMax : servoPositions[x]));
+      }      
+    } else if (targetBar == "camerabar") {
+      return;
+    } else {
+      return;
     }
+    
     lastCommandTime = currentTime;
     eventsFired += 1;
-    document.getElementById("debug").innerHTML = servoPositions + "\n" + eventsFired;
+    document.getElementById("debug").innerHTML = servoPositions + "<br>" + eventsFired + "<br>" + targetBar;
     sendCommand(servoPositions);
     targetBall.style.left = (cursorPos[0]-targetBallSize/2) + "px";
     targetBall.style.top = (cursorPos[1]-targetBallSize/2) + "px";    
   }
 
   return false;
-}
-
-function rotateLeft(){
-  for(x in servoPositions){
-    servoPositions[x] = Math.round((-CW[x] * 0.5 * servoRange + servoCentre)*100)/100;
-    servoPositions[x] = ((servoPositions[x] < servoRangeMin) ? servoRangeMin : ((servoPositions[x] > servoRangeMax) ? servoRangeMax : servoPositions[x]));
-  }    
-  eventsFired += 1;
-  document.getElementById("debug").innerHTML = servoPositions + "\n" + eventsFired;
-  sendCommand(servoPositions);  
-}
-
-function rotateRight(){
-  for(x in servoPositions){
-    servoPositions[x] = Math.round((CW[x] * 0.5 * servoRange + servoCentre)*100)/100;
-    servoPositions[x] = ((servoPositions[x] < servoRangeMin) ? servoRangeMin : ((servoPositions[x] > servoRangeMax) ? servoRangeMax : servoPositions[x]));
-  }    
-  eventsFired += 1;
-  document.getElementById("debug").innerHTML = servoPositions + "\n" + eventsFired;
-  sendCommand(servoPositions);    
 }
 
 var commandSend = getXMLHttpObject(); 
@@ -176,14 +167,19 @@ function getXMLHttpObject(){
 
 function init(){
   //Using Legacy Events for widest support of browsers and platforms
-  document.getElementById("main").onmousedown = document.getElementById("main").ontouchstart = mouseDown;
+  mainBar   = document.getElementById("mainbar");
+  rotateBar = document.getElementById("rotatebar");
+  cameraBar = document.getElementById("camerabar");
+  
+  mainBar.onmousedown = mainBar.ontouchstart = mouseDown;
+  rotateBar.onmousedown = rotateBar.ontouchstart = mouseDown;
+  cameraBar.onmousedown = cameraBar.ontouchstart = mouseDown;
+  
   document.onmouseup = document.ontouchend = mouseUp;
+  
   targetBall = document.getElementById("targetball");
   originBall = document.getElementById("originball");
-  document.getElementById("rotateleft").onmousedown = rotateLeft;
-  document.getElementById("rotateleft").onmouseup = mouseUp;
-  document.getElementById("rotateright").onmousedown = rotateRight;
-  document.getElementById("rotateright").onmouseup = mouseUp;
+  
   docMinSize = (document.documentElement.clientWidth < document.documentElement.clientHeight?document.documentElement.clientWidth:document.documentElement.clientHeight);
   targetBallSize = 2 * Math.round(docMinSize / 20);
   originBallSize = 2 * Math.round(docMinSize / 20);
