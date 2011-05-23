@@ -35,7 +35,7 @@
     
     //Mapping Table for Wheel Motion Directions 
     var F   = [1,1,-1,-1];
-    var R   = [1,-1,-1,1];
+    var R   = [-1,1,1,-1];
     var CW  = [-1,-1,-1,-1];
     
     var accelID = null;
@@ -60,7 +60,7 @@
     
     var bEnabled = false;
     var bRotate = false;
-    var bFlipDir = false;
+    var bFlipDir = true;  //True for default accelerometer
     
     commandURL = "http://10.10.10.10:8080/command/";
     

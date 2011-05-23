@@ -27,8 +27,8 @@ DeviceMotion Axes
 //Mapping Table for Wheel Motion Directions 
 var F   = [1,1,-1,-1];
 //var B   = [-1,-1,1,1];
-var R   = [1,-1,-1,1];
-//var L   = [-1,1,1,-1];
+var R   = [-1,1,1,-1];
+//var L   = [1,-1,-1,1];
 var CW  = [-1,-1,-1,-1];
 //var CCW = [1,1,1,1];
 var servoPositions = [0,0,0,0];
