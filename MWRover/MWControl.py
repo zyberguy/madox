@@ -14,7 +14,7 @@ import threading
 PORT="/dev/ttyACM0"
 BAUDRATE = 9600
 BYTESIZE = 8
-PARITY   = serial.PARITY_EVEN
+PARITY   = serial.PARITY_NONE
 STOPBITS = 1
 XONXOFF  = False
 RTSCTS   = False
@@ -71,8 +71,8 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
   HTTP Request Handler
   """
   def do_GET(self):
-    #Get eTISSpy.* case
-    if self.path[:8] == "/MWRover":
+    #Get /MWRover.* case or /www/*
+    if self.path[:8] == "/MWRover" or self.path[:5] == "/www/":
       try:
         f = open(self.path[1:], "r")
         Response = f.read()

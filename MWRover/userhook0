@@ -2,4 +2,10 @@ export PATH=/mnt/storage/bin:/mnt/storage/MWRover:$PATH
 MW_setup_ap.sh
 start_sshd.sh
 cd /mnt/storage/MWRover
-python MWControl.py
+python MWControl.py&
+
+cd /mnt/storage/MWRover/mjpg
+export LD_LIBRARY_PATH=/mnt/storage/MWRover/mjpg
+./mjpg_streamer -i "./input_uvc.so -n -q 60 -r QVGA -f 6 -d /dev/video0" -o "./output_http.so -p 8888 -n"&
+
+read -p "This is a pause to stop continued execution..."
