@@ -1,6 +1,6 @@
 TARGET=oddbot-launchpad
 CC=msp430-gcc
-CFLAGS=-Os -Wall -g -mmcu=msp430x2231
+CFLAGS=-Os -Wall -g -mmcu=msp430g2231
 
 OBJS=$(TARGET).o
 
